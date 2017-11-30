@@ -83,11 +83,11 @@ AFRAME.registerComponent("add-images", {
       var el = document.createElement("a-plane")
       el.setAttribute('material', {
         transparent: true, 
-        opacity: 0.5,
+        opacity: 0.2,
         src: '/assets/droso_WT/Mem_02/t_1_z_'+ (n+1) +'.png',
         side: 'double'
       });
-      el.setAttribute('position', {x: 1, y: 2, z: n/18*0.1});
+      el.setAttribute('position', {x: 0, y: 2, z: n/18*0.1});
       // el.setAttribute('src', )
 
       // console.log(el)

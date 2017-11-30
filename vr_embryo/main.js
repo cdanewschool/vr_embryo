@@ -80,11 +80,20 @@ AFRAME.registerComponent("add-images", {
     _(18).times(function(n) {
       // console.log("/assets/droso_WT/Mem_02/t_1_z_"+ (n+1) +".png")
 
-      var el = document.createElement("a-image")
-      el.setAttribute('material', {transparent: true, opacity: 0.5});
-      el.setAttribute('position', {x: 1, y: 2, z: n/18/2*-5});
-      el.setAttribute('src', '/assets/droso_WT/Mem_02/t_1_z_'+ (n+1) +'.png')
+      var el = document.createElement("a-plane")
+      el.setAttribute('material', {
+        transparent: true, 
+        opacity: 0.2,
+        src: '/assets/droso_WT/Mem_02/t_1_z_'+ (n+1) +'.png',
+        side: 'double'
+      });
+      el.setAttribute('position', {x: 0, y: 2, z: n/18*0.1});
+      // el.setAttribute('src', )
 
+      // console.log(el)
+      // var thing = el.getObject3D('mesh')
+      // console.log(thing)
+      // thing.material.blending = "THREE.AdditiveBlending"
 
       parent.appendChild(el)
     })

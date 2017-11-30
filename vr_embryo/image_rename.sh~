@@ -1,0 +1,3 @@
+for dataset in assets/*; do
+    echo dataset
+done

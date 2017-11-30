@@ -1,36 +1,59 @@
+var app = app || {}
+
+// data model for the embryo
+app.embryo = {
+  species: "drosophilia melanogaster", // name of the species
+  locator: "dro-mel-fr-sl-2-450", // format: genus_species_type_lab_channels_frames
+  slices: 18,
+  steps: 24,
+  time: 35280, // total seconds of recording
+  frames: 450,
+  framerate: 0, // will be useful if we want to display an image at a given time in seconds
+  type: "fluorescence recording", // microscopy type
+  origin: "Shvartsman Lab", // lab origin
+  channels: {
+    "membrane staining": [],
+    "nuclear staining": []
+  },
+  init: function() {
+    var cmp = this
+    var imagesloaded = new Event('imagesloaded')
+    // then after loading the images, call document.dispatchEvent('imagesloaded')
+
+    cmp.framerate = cmp.frames/cmp.time
+
+    _(cmp.frames).times(f => {
+      _(cmp.channels).each((arr, key) => {
+        var folder = key.replace(/\s/, '-')
+
+        // iterate over each file
+        // var path = "assets/"+ cmp.locator +"/"+ folder +"/"+ filename
+      })
+    })
+
+
+  },
+  getImage: function(channel, time) {
+    // an example of building functionality into the embryo object
+    return channels[channel][time]
+  }
+}
+
 function make(what) {
   var el = document.createElement(what)
   return el;
 }
 
-// AFRAME.registerComponent("axes", {
-//   init: function() {
-//     var entity = this.el
-//         _(3).times(axis => {
-//           _(20).times(n =>{
-//             var loc = n - 10
-//             var point = make("asphere")
-//             point.setAttribute("position", {
-//               x: (axis = 0) ? loc : 0,
-//               y: (axis = 1) ? loc : 0,
-//               z: (axis = 2) ? loc : 0
-//             })
-//             point.setAttribute("material", {
-//               color: "white"
-//             })
-//             point.setAttribute("light", {
-//               color: "white",
-//               intensity: 0.75
-//             })
-//             entity.appendChild(point)
-//           })
-//         })
-//   }
-// })
+
 
 AFRAME.registerComponent("axes", {
+  schema: {
+    points: {type: "number", default: 3},
+    size: {type: "number", default: .025}
+  },
   init: function() {
-    var entity = this.el
+    var cmp = this
+    var entity = cmp.el
     var colors = ["rgb(255,0,0)", "rgb(0,255,100)", "rgb(0,0,255)"]
 
     var group = document.createElement("a-entity")
@@ -38,9 +61,8 @@ AFRAME.registerComponent("axes", {
 
     _(3).times(a => {
       var axis = a
-
-      _(20).times(n =>{
-        var pos = n - 10
+      _(cmp.data.points).times(n =>{
+        var pos = n - cmp.data.points/2
         var loc = {
           x: (axis == 0) ? pos : 0,
           y: (axis == 1) ? pos : 0,
@@ -49,7 +71,7 @@ AFRAME.registerComponent("axes", {
         // console.log("axis:", axis, "loc:", loc)
 
         var point = make("a-sphere")
-        point.setAttribute("radius", 0.05)
+        point.setAttribute("radius", cmp.data.size)
         point.setAttribute("position", loc)
         point.setAttribute("material", {
           color: colors[axis],

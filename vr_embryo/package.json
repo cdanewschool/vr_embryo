@@ -4,7 +4,7 @@
   "version": "0.3.0",
   "license": "MIT",
   "scripts": {
-    "start": "budo --live --verbose --port 3000 --open",
+    "start": "budo main.js --live --verbose --port 3000 --open",
     "deploy": "ghpages",
     "ghpages": "ghpages"
   },
@@ -21,6 +21,7 @@
     "vr"
   ],
   "dependencies": {
+    "aframe": "^0.7.1",
     "lodash": "^4.17.4"
   }
 }

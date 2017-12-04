@@ -4,9 +4,11 @@ var _ = require('lodash')
 var app = app || {}
 
 app.ctl = {
-  spacing: 0.2,
+  zspacing: 0.2,
   initialposition: {x: 0, y: 0, z: -2}
 }
+
+app.coordinates = AFRAME.utils.coordinates;
 
 // data model for the embryo
 app.embryo = {
@@ -72,7 +74,57 @@ function make(what) {
   return el;
 }
 
+window.addEventListener("wheel", e => {
+  var pl = document.querySelector("#doodle")
+  console.log(e.deltaY)
+  pl.setAttribute("polyline", {
+    path: (e.deltaY/10) + " 0 -4, 0 1 -4, 1 0 -5, 0 2 -6"
+  })
 
+  var stack = document.querySelector("#embryo1")
+  stack.setAttribute("embryo-stack", {
+    accordion: e.deltaY/10
+  })
+})
+
+AFRAME.registerComponent("polyline", {
+  schema: {
+    color: { default: "#fff" },
+    path: {
+      default: [
+        {x: 0.5, y: 0, z: 0},
+        {x: -0.5, y: 0, z: 0}
+      ],
+      // Deserialize path in the form of comma-separated vec3s: `0 0 0, 1 1 1, 2 0 3`.
+      parse: function (value) {
+        return value.split(',').map(app.coordinates.parse);
+      },
+
+      // Serialize array of vec3s in case someone does
+      // setAttribute('line', 'path', [...]).
+      stringify: function (data) {
+        return data.map(app.coordinates.stringify).join(',');
+      }
+    }
+
+  },
+  update: function(old_data) {
+    var mat = new THREE.LineBasicMaterial({
+      color: this.data.color
+    })
+    var geom = new THREE.Geometry()
+    this.data.path.forEach(vertex => {
+      geom.vertices.push(
+        new THREE.Vector3(vertex.x, vertex.y, vertex.z)
+      )
+    })
+
+    this.el.setObject3D("mesh", new THREE.Line(geom, mat))
+  },
+  remove: function() {
+    this.el.removeObject3D('mesh');
+  }
+})
 
 AFRAME.registerComponent("axes", {
   schema: {
@@ -121,35 +173,65 @@ AFRAME.registerComponent("axes", {
   }
 })
 
-
 AFRAME.registerComponent("embryo-stack", {
+
+  // break this up into individual components, one per slice. then generate / remove them in loops
+
   schema: {
-    accordion: {type: "number", default: app.ctl.spacing} // i *think* this is how you modify spacing on the fly?
+    accordion: {default: 0.2},
+    skew: {default: 0}
   },
   init: function() {
+    var cmp = this
     app.embryo.init()
     console.log("embryo", app.embryo)
-  },
-  update: function() {
-    var parent = document.querySelector("#embryo1")
-
     _(app.embryo.channels).each((ch, channelname) => {
       _(app.embryo.slices).times(function(n) {
-        // iterate through slices, "n" is number of current slice
-        // console.log("/assets/droso_WT/Mem_02/t_1_z_"+ (n) +".png")
-
-        var el = document.createElement("a-image")
-        el.setAttribute('material', {
-          shader: "standard",
-          side: "double",
+        var ell = document.createElement("a-image")
+        var txl = new THREE.TextureLoader()
+        var geometry = new THREE.PlaneGeometry(5,5)
+        var material = new THREE.MeshBasicMaterial({
+          side: THREE.DoubleSide,
           transparent: true,
           opacity: 0.2,
-          src: ch.images[n]
-        });
-        el.setAttribute('position', {x: app.ctl.initialposition.x, y: app.ctl.initialposition.y, z: n/app.embryo.slices * app.ctl.spacing + app.ctl.initialposition.z});
-
-        parent.appendChild(el)
+          depthWrite: false,
+          blending: THREE.AdditiveBlending
+        })
+        txl.load(ch.images[n], (texture) => {
+          material.map = texture
+          var mesh = new THREE.Mesh(geometry, material);
+          ell.setObject3D("mesh", mesh)
+          ell.id = ch + _ + n
+          cmp.el.appendChild(ell)
+        })
       })
     })
+  },
+  update: function(old_data) {
+    var cmp = this
+    var parent = document.querySelector("#embryo1")
+
+    // _(app.embryo.channels).each((ch, channelname) => {
+    //   _(app.embryo.slices).times(function(n) {
+    //     // iterate through slices, "n" is number of current slice
+    //     // console.log("/assets/droso_WT/Mem_02/t_1_z_"+ (n) +".png")
+
+    //     var el = document.createElement("a-image")
+    //     el.setAttribute('material', {
+    //       shader: "standard",
+    //       side: "double",
+    //       transparent: true,
+    //       opacity: 0.2,
+    //       src: ch.images[n]
+    //     });
+    //     el.setAttribute('position', {
+    //       x: app.ctl.initialposition.x + cmp.data.skew,
+    //       y: app.ctl.initialposition.y,
+    //       z: n/app.embryo.slices * cmp.data.accordion + app.ctl.initialposition.z
+    //     });
+
+    //     parent.appendChild(el)
+    //   })
+    // })
   }
 })

@@ -76,14 +76,17 @@ function make(what) {
 
 window.addEventListener("wheel", e => {
   var pl = document.querySelector("#doodle")
-  console.log(e.deltaY)
+  // console.log(e.deltaY)
   pl.setAttribute("polyline", {
     path: (e.deltaY/10) + " 0 -4, 0 1 -4, 1 0 -5, 0 2 -6"
   })
 
   var stack = document.querySelector("#embryo1")
+  var current = [stack.getAttribute("embryo-stack").accordion, stack.getAttribute("embryo-stack").skew]
+
   stack.setAttribute("embryo-stack", {
-    accordion: e.deltaY/10
+    accordion: current[0] += e.deltaY,
+    skew: current[1] += e.deltaX
   })
 })
 
@@ -179,44 +182,75 @@ AFRAME.registerComponent("embryo-stack", {
 
   schema: {
     accordion: {default: 0.2},
+    accordionDelta: {default: 0},
     skew: {default: 0}
   },
   init: function() {
     var cmp = this
     app.embryo.init()
     console.log("embryo", app.embryo)
+
     _(app.embryo.channels).each((ch, channelname) => {
       _(app.embryo.slices).times(function(n) {
-        var ell = document.createElement("a-image")
+
+        var ell = document.createElement("a-plane")
         var txl = new THREE.TextureLoader()
         var geometry = new THREE.PlaneGeometry(5,5)
         var material = new THREE.MeshBasicMaterial({
-          side: THREE.DoubleSide,
           transparent: true,
-          opacity: 0.2,
-          depthWrite: false,
-          blending: THREE.AdditiveBlending
+          opacity: 0.2
         })
+
+        // txl.load("assets/datasets/dro-mel-fr-sl-2-450/membrane-staining/t_0_z_0.png", function() {})
+
         txl.load(ch.images[n], (texture) => {
-          material.map = texture
+          var material = new THREE.MeshBasicMaterial({
+            map: texture,
+            side: THREE.DoubleSide,
+            transparent: true,
+            opacity: 0.2,
+            depthWrite: false,
+            blending: THREE.AdditiveBlending
+          })
+          // console.log(ch.images[n])
+
           var mesh = new THREE.Mesh(geometry, material);
           ell.setObject3D("mesh", mesh)
-          ell.id = ch + _ + n
+          ell.id = channelname + _ + n
           cmp.el.appendChild(ell)
         })
+
       })
     })
   },
   update: function(old_data) {
     var cmp = this
-    var parent = document.querySelector("#embryo1")
+    var parent = this.el
+    var kids = cmp.el.querySelectorAll("*")
+    _(kids).each((ell, ix) => {
+      ratio = ix/app.embryo.slices
+      // console.log(ix/app.embryo.slices * cmp.data.accordion + app.ctl.initialposition.z)
+      ell.setAttribute('position', {
+        x: app.ctl.initialposition.x + ratio * cmp.data.skew * 0.01,
+        y: app.ctl.initialposition.y,
+        z: app.ctl.initialposition.z + ratio * cmp.data.accordion * 0.01
+      })
+    })
+
+    // el.children.forEach(function(ell) {
+      // ell.setAttribute("position", {
+              // x: app.ctl.initialposition.x + cmp.data.skew,
+              // y: app.ctl.initialposition.y,
+              // z: n/app.embryo.slices * cmp.data.accordion + app.ctl.initialposition.z
+      // })
+    // })
 
     // _(app.embryo.channels).each((ch, channelname) => {
-    //   _(app.embryo.slices).times(function(n) {
-    //     // iterate through slices, "n" is number of current slice
-    //     // console.log("/assets/droso_WT/Mem_02/t_1_z_"+ (n) +".png")
+      // _(app.embryo.slices).times(function(n) {
+        // iterate through slices, "n" is number of current slice
+        // console.log("/assets/droso_WT/Mem_02/t_1_z_"+ (n) +".png")
 
-    //     var el = document.createElement("a-image")
+        // var el = document
     //     el.setAttribute('material', {
     //       shader: "standard",
     //       side: "double",

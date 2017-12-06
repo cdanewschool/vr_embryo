@@ -1,8 +1,0 @@
-AFRAME.registerComponent("add-images", {
-  init: function() {
-    console.log("happening")
-    _(18).times(function(n) {
-      var el = docu
-    })
-  }
-})

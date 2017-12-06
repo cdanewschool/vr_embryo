@@ -8,10 +8,21 @@
         <!-- <script src="assets/js/lodash.min.js"></script> -->
         <script src="main.js"></script>
     </head>
+
     <body>
         <a-scene id="mainscene" axes="points: 30">
+
+            <a-entity camera look-controls wasd-controls>
+                <a-entity cursor="fuse: true; fuseTimeout: 500"
+                          position="0 0 -1"
+                          geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
+                          material="color: black; shader: flat">
+                </a-entity>
+            </a-entity>
+
+
             <a-plane color="rgb(127,127,127)" position="0 -3 0" rotation="-90 0 0" width="20" height="20"></a-plane>
-            <a-entity embryo-stack class="dataset-image" id="embryo1"></a-entity>
+            <a-entity embryo-stack cursor-listener class="dataset-image" id="embryo1"></a-entity>
             <a-entity id="doodle" polyline="path: 0 0 -4, 0 1 -4, 1 0 -5, 0 2 -6"></a-entity>
             <a-sky color="rgb(60,60,60)"></a-sky>
 

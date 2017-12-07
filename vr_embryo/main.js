@@ -10,6 +10,17 @@ app.ctl = {
 
 app.coordinates = AFRAME.utils.coordinates;
 
+function make(what) {
+  var el = document.createElement(what)
+  return el;
+}
+
+Element.prototype.setAttributes = function(attrs) {
+  for(var key in attrs) {
+    this.setAttribute(key, attrs[key]);
+  }
+}
+
 // data model for the embryo
 app.embryo = {
   species: "drosophilia melanogaster", // name of the species
@@ -25,11 +36,13 @@ app.embryo = {
     // ideally these (and this whole object) would be generated server-side from the file hierarchy
     "membrane-staining": {
       path: "",
-      images: []
+      images: [],
+      color: "hsl(50, 100%, 20%)"
     },
     "nuclear-staining": {
       path: "",
-      images: []
+      images: [],
+      color: "hsl(180, 100%, 40%)"
     }
   },
   init: function() {
@@ -69,17 +82,9 @@ app.embryo = {
   }
 }
 
-function make(what) {
-  var el = document.createElement(what)
-  return el;
-}
 
 window.addEventListener("wheel", e => {
-  var pl = document.querySelector("#doodle")
-  // console.log(e.deltaY)
-  pl.setAttribute("polyline", {
-    path: (e.deltaY/10) + " 0 -4, 0 1 -4, 1 0 -5, 0 2 -6"
-  })
+
 
   var stack = document.querySelector("#embryo1")
   var current = [stack.getAttribute("embryo-stack").accordion, stack.getAttribute("embryo-stack").skew]
@@ -88,45 +93,6 @@ window.addEventListener("wheel", e => {
     accordion: current[0] += e.deltaY,
     skew: current[1] += e.deltaX
   })
-})
-
-AFRAME.registerComponent("polyline", {
-  schema: {
-    color: { default: "#fff" },
-    path: {
-      default: [
-        {x: 0.5, y: 0, z: 0},
-        {x: -0.5, y: 0, z: 0}
-      ],
-      // Deserialize path in the form of comma-separated vec3s: `0 0 0, 1 1 1, 2 0 3`.
-      parse: function (value) {
-        return value.split(',').map(app.coordinates.parse);
-      },
-
-      // Serialize array of vec3s in case someone does
-      // setAttribute('line', 'path', [...]).
-      stringify: function (data) {
-        return data.map(app.coordinates.stringify).join(',');
-      }
-    }
-
-  },
-  update: function(old_data) {
-    var mat = new THREE.LineBasicMaterial({
-      color: this.data.color
-    })
-    var geom = new THREE.Geometry()
-    this.data.path.forEach(vertex => {
-      geom.vertices.push(
-        new THREE.Vector3(vertex.x, vertex.y, vertex.z)
-      )
-    })
-
-    this.el.setObject3D("mesh", new THREE.Line(geom, mat))
-  },
-  remove: function() {
-    this.el.removeObject3D('mesh');
-  }
 })
 
 AFRAME.registerComponent("axes", {
@@ -139,7 +105,7 @@ AFRAME.registerComponent("axes", {
     var entity = cmp.el
     var colors = ["rgb(255,0,0)", "rgb(0,255,100)", "rgb(0,0,255)"]
 
-    var group = document.createElement("a-entity")
+    var group = make("a-entity")
     group.setAttribute("id", "axes")
 
     _(3).times(a => {
@@ -176,6 +142,48 @@ AFRAME.registerComponent("axes", {
   }
 })
 
+AFRAME.registerComponent("outline", {
+  schema: {
+    color: {default: "#fff"}
+  },
+  init: function() {
+    var mesh = this.el.getObject3D("mesh")
+    var egeo = new THREE.EdgesGeometry( mesh.geometry ); // or WireframeGeometry
+    var emat = new THREE.LineBasicMaterial( {
+      color: this.data.color,
+      transparent: true,
+      opacity: 0.4,
+      linewidth: 1
+    });
+    var wireframe = new THREE.LineSegments( egeo, emat );
+    mesh.add( wireframe );
+  }
+
+})
+
+AFRAME.registerComponent("imaging-slice", {
+  schema: {
+    imgpath: { default: "assets/datasets/dro-mel-fr-sl-2-450/membrane-staining/t_24_z_17.png" },
+    color:   { default: "#fff" }
+  },
+  init: function() {
+    var texture = new THREE.TextureLoader().load(this.data.imgpath)
+    var geometry = new THREE.PlaneGeometry(1,1)
+    var material = new THREE.MeshBasicMaterial({
+      color: this.data.color,
+      alphaMap: texture,
+      side: THREE.DoubleSide,
+      transparent: true,
+      opacity: 0.2,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending
+    })
+    var mesh = new THREE.Mesh(geometry, material);
+    this.el.setObject3D("mesh", mesh)
+  }
+
+})
+
 AFRAME.registerComponent("embryo-stack", {
 
   // break this up into individual components, one per slice. then generate / remove them in loops
@@ -192,33 +200,57 @@ AFRAME.registerComponent("embryo-stack", {
 
     _(app.embryo.channels).each((ch, channelname) => {
       _(app.embryo.slices).times(function(n) {
+        console.log(ch.images[n])
+        var plane = make("a-plane")
 
-        var ell = document.createElement("a-plane")
-        var txl = new THREE.TextureLoader()
-        var geometry = new THREE.PlaneGeometry(5,5)
-        var material = new THREE.MeshBasicMaterial({
-          transparent: true,
-          opacity: 0.2
+        plane.setAttributes({
+          "imaging-slice": {
+            imgpath: ch.images[n],
+            color: ch.color
+          },
+          "outline": {
+            color: ch.color
+          },
+          "class": channelname
         })
 
-        // txl.load("assets/datasets/dro-mel-fr-sl-2-450/membrane-staining/t_0_z_0.png", function() {})
+        // plane.setAttribute("imaging-slice", {
+        //   imgpath: ch.images[n],
+        //   color: ch.color
+        // })
+        // plane.setAttribute("outline", {
+        //   color: ch.color
+        // })
+        // plane.setAttribute("class", channelname)
+        plane.id = channelname + "-" + n
+        cmp.el.appendChild(plane)
 
-        txl.load(ch.images[n], (texture) => {
-          var material = new THREE.MeshBasicMaterial({
-            map: texture,
-            side: THREE.DoubleSide,
-            transparent: true,
-            opacity: 0.2,
-            depthWrite: false,
-            blending: THREE.AdditiveBlending
-          })
-          // console.log(ch.images[n])
+        // var ell = make("a-plane")
+        // var txl = new THREE.TextureLoader()
+        // var geometry = new THREE.PlaneGeometry(5,5)
+        // var material = new THREE.MeshBasicMaterial({
+        //   transparent: true,
+        //   opacity: 0.2
+        // })
 
-          var mesh = new THREE.Mesh(geometry, material);
-          ell.setObject3D("mesh", mesh)
-          ell.id = channelname + _ + n
-          cmp.el.appendChild(ell)
-        })
+        // // txl.load("assets/datasets/dro-mel-fr-sl-2-450/membrane-staining/t_0_z_0.png", function() {})
+
+        // txl.load(ch.images[n], (texture) => {
+        //   var material = new THREE.MeshBasicMaterial({
+        //     map: texture,
+        //     side: THREE.DoubleSide,
+        //     transparent: true,
+        //     opacity: 0.2,
+        //     depthWrite: false,
+        //     blending: THREE.AdditiveBlending
+        //   })
+        //   // console.log(ch.images[n])
+
+        //   var mesh = new THREE.Mesh(geometry, material);
+        //   ell.setObject3D("mesh", mesh)
+        //   ell.id = channelname + _ + n
+        //   cmp.el.appendChild(ell)
+        // })
 
       })
     })

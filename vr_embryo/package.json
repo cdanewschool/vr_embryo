@@ -1,6 +1,6 @@
 {
-  "name": "aframe-hello-world-boilerplate",
-  "description": "Boilerplate with A-Frame's 'Hello, World!' of WebVR.",
+  "name": "embryo-digital-atlas",
+  "description": "VR implementation of the Embryo Digital Atlas",
   "version": "0.3.0",
   "license": "MIT",
   "scripts": {

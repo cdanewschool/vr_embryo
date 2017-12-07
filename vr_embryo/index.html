@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <title>Hello, World! - A-Frame</title>
-        <meta name="description" content="Hello, World! - A-Frame">
+        <meta name="description" content="EDA VR">
         <!-- <script src="https://aframe.io/releases/0.5.0/aframe.min.js"></script> -->
         <!-- <script src="assets/js/lodash.min.js"></script> -->
         <script src="main.js"></script>
@@ -32,8 +32,11 @@
 
 
             <a-plane color="rgb(127,127,127)" position="0 -3 0" rotation="-90 0 0" width="20" height="20"></a-plane>
-            <a-entity embryo-stack cursor-listener class="dataset-image" id="embryo1"></a-entity>
+            <a-entity embryo-stack super-hands class="dataset-image" id="embryo1"></a-entity>
             <a-sky color="rgb(60,60,60)"></a-sky>
+
+            <!-- <a-entity vive-controls="hand: left"></a-entity> -->
+            <!-- <a-entity vive-controls="hand: right"></a-entity> -->
 
         </a-scene>
     </body>

@@ -26,6 +26,7 @@
   ],
   "dependencies": {
     "aframe": "^0.7.1",
-    "lodash": "^4.17.4"
+    "lodash": "^4.17.4",
+    "super-hands": "^2.1.0"
   }
 }

@@ -1,4 +1,5 @@
 require('aframe');
+require('super-hands')
 var _ = require('lodash')
 
 var app = app || {}
@@ -211,6 +212,10 @@ AFRAME.registerComponent("embryo-stack", {
           "outline": {
             color: ch.color
           },
+          "hoverable": "",
+          "clickable": "",
+          "grabbable": "",
+          "stretchable": "",
           "class": channelname
         })
 

@@ -87,7 +87,7 @@ AFRAME.registerComponent("add-images", {
         src: '/assets/droso_WT/Mem_02/t_1_z_'+ (n+1) +'.png',
         side: 'double'
       });
-      el.setAttribute('position', {x: 0, y: 2, z: n/18*0.1});
+      el.setAttribute('position', {x: 0, y: 1.5, z: n/18*0.25-1});
       // el.setAttribute('src', )
 
       // console.log(el)
@@ -97,5 +97,29 @@ AFRAME.registerComponent("add-images", {
 
       parent.appendChild(el)
     })
-  }
+  },
+
+
+  // update: function (oldData) {
+  //   var data = this.data;
+  //   var el = this.el;
+
+  //   var parent = document.querySelector("#embryo1")
+  //   console.log(parent)
+
+  //   // If `oldData` is empty, then this means we're in the initialization process.
+  //   // No need to update.
+  //   if (Object.keys(oldData).length === 0) { return; }
+  //   // Geometry-related properties changed. Update the geometry.
+  //   if (data.width !== oldData.width ||
+  //       data.height !== oldData.height ||
+  //       data.depth !== oldData.depth) {
+  //     el.getObject3D('mesh').geometry = new THREE.BoxBufferGeometry(data.width, data.height,
+  //                                                                   data.depth);
+  //   }
+  //   // Material-related properties changed. Update the material.
+  //   if (data.color !== oldData.color) {
+  //     el.getObject3D('mesh').material.color = data.color;
+  //   }
+  // }
 })

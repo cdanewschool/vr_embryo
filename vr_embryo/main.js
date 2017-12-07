@@ -214,44 +214,8 @@ AFRAME.registerComponent("embryo-stack", {
           "class": channelname
         })
 
-        // plane.setAttribute("imaging-slice", {
-        //   imgpath: ch.images[n],
-        //   color: ch.color
-        // })
-        // plane.setAttribute("outline", {
-        //   color: ch.color
-        // })
-        // plane.setAttribute("class", channelname)
         plane.id = channelname + "-" + n
         cmp.el.appendChild(plane)
-
-        // var ell = make("a-plane")
-        // var txl = new THREE.TextureLoader()
-        // var geometry = new THREE.PlaneGeometry(5,5)
-        // var material = new THREE.MeshBasicMaterial({
-        //   transparent: true,
-        //   opacity: 0.2
-        // })
-
-        // // txl.load("assets/datasets/dro-mel-fr-sl-2-450/membrane-staining/t_0_z_0.png", function() {})
-
-        // txl.load(ch.images[n], (texture) => {
-        //   var material = new THREE.MeshBasicMaterial({
-        //     map: texture,
-        //     side: THREE.DoubleSide,
-        //     transparent: true,
-        //     opacity: 0.2,
-        //     depthWrite: false,
-        //     blending: THREE.AdditiveBlending
-        //   })
-        //   // console.log(ch.images[n])
-
-        //   var mesh = new THREE.Mesh(geometry, material);
-        //   ell.setObject3D("mesh", mesh)
-        //   ell.id = channelname + _ + n
-        //   cmp.el.appendChild(ell)
-        // })
-
       })
     })
   },
@@ -268,36 +232,5 @@ AFRAME.registerComponent("embryo-stack", {
         z: app.ctl.initialposition.z + ratio * cmp.data.accordion * 0.01
       })
     })
-
-    // el.children.forEach(function(ell) {
-      // ell.setAttribute("position", {
-              // x: app.ctl.initialposition.x + cmp.data.skew,
-              // y: app.ctl.initialposition.y,
-              // z: n/app.embryo.slices * cmp.data.accordion + app.ctl.initialposition.z
-      // })
-    // })
-
-    // _(app.embryo.channels).each((ch, channelname) => {
-      // _(app.embryo.slices).times(function(n) {
-        // iterate through slices, "n" is number of current slice
-        // console.log("/assets/droso_WT/Mem_02/t_1_z_"+ (n) +".png")
-
-        // var el = document
-    //     el.setAttribute('material', {
-    //       shader: "standard",
-    //       side: "double",
-    //       transparent: true,
-    //       opacity: 0.2,
-    //       src: ch.images[n]
-    //     });
-    //     el.setAttribute('position', {
-    //       x: app.ctl.initialposition.x + cmp.data.skew,
-    //       y: app.ctl.initialposition.y,
-    //       z: n/app.embryo.slices * cmp.data.accordion + app.ctl.initialposition.z
-    //     });
-
-    //     parent.appendChild(el)
-    //   })
-    // })
   }
 })

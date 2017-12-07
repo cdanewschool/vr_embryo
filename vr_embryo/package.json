@@ -3,13 +3,17 @@
   "description": "VR implementation of the Embryo Digital Atlas",
   "version": "0.3.0",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cdanewschool/vr_tests.git"
+  },
   "scripts": {
     "start": "budo main.js --live --verbose --port 3000 --open",
-    "deploy": "ghpages",
+    "deploy": "browserify main.js | uglifyjs > bundle.js && ghpages",
     "ghpages": "ghpages"
   },
   "devDependencies": {
-    "budo": "10.0.4",
+    "budo": "^10.0.4",
     "ghpages": "0.0.10"
   },
   "keywords": [

@@ -1,5 +1,4 @@
-# vr_tests
-Repository for vr experimentation
+# Immersed in Microscopy
 
 The aim of this project is to interface multimodal microscopy images with a VR headset using A-frame.
 

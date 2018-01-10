@@ -192,17 +192,15 @@ AFRAME.registerComponent("imaging-slice", {
     // ,AM: {}
   },
   init: function() {
+    var cmp = this
 
-  },
-
-  update: function() {
-    var newpath = this.data.imgpath.replace(/t_[0-9]+_/g, "t_" + this.data.time + "_")
-
-    var texture = new THREE.TextureLoader().load(newpath)
+    this.textures = _(app.embryo.steps).times(t => {
+      return new THREE.TextureLoader().load(cmp.data.imgpath.replace(/t_[0-9]+_/g, "t_" + t + "_"))
+    })
     var geometry = new THREE.PlaneGeometry(1,1)
     var material = new THREE.MeshBasicMaterial({
       color: this.data.color,
-      alphaMap: texture,
+      alphaMap: this.textures[this.data.time],
       //alphaMap: this.data.AM
       side: THREE.DoubleSide,
       transparent: true,
@@ -212,6 +210,11 @@ AFRAME.registerComponent("imaging-slice", {
     })
     var mesh = new THREE.Mesh(geometry, material);
     this.el.setObject3D("mesh", mesh)
+  },
+
+  update: function() {
+    console.log(this.data.time)
+    this.el.getObject3D("mesh").material.alphaMap = this.textures[this.data.time]
   }
 
 })
@@ -233,7 +236,7 @@ AFRAME.registerComponent("embryo-stack", {
 
     _(app.embryo.channels).each((ch, channelname) => {
       _(app.embryo.slices).times(function(n) {
-        console.log(ch.images[n])
+
         var plane = make("a-plane")
 
         plane.setAttributes({

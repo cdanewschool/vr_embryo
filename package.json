@@ -1,0 +1,36 @@
+{
+  "name": "embryo-digital-atlas",
+  "description": "VR implementation of the Embryo Digital Atlas",
+  "version": "0.3.0",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cdanewschool/vr_tests.git"
+  },
+  "bugs": {
+    "url": "https://github.com/cdanewschool/vr_embryo/issues"
+  },
+  "homepage": "https://github.com/cdanewschool/vr_embryo#immersed-in-microscopy",
+  "scripts": {
+    "start": "budo main.js --live --verbose --port 3000 --open",
+    "deploy": "browserify main.js | uglifyjs > bundle.js && ghpages",
+    "ghpages": "ghpages"
+  },
+  "devDependencies": {
+    "budo": "^10.0.4",
+    "ghpages": "0.0.10"
+  },
+  "keywords": [
+    "aframe",
+    "aframe-example",
+    "aframe-boilerplate",
+    "aframe-scene",
+    "webvr",
+    "vr"
+  ],
+  "dependencies": {
+    "aframe": "^0.7.1",
+    "lodash": "^4.17.4",
+    "super-hands": "^2.1.0"
+  }
+}

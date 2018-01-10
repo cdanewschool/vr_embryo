@@ -36,6 +36,20 @@ app.embryo = {
   channels: {
     // ideally these (and this whole object) would be generated server-side from the file hierarchy
     "membrane-staining": {
+       time: [
+        {step: 1,
+         images: [
+           "img/path",
+           "img2/path",
+           "img3/path"
+         ]},
+         {step: 2,
+         images: [
+           "img/path",
+           "img2/path",
+           "img3/path"
+         ]}
+     ],
       path: "",
       images: [],
       color: "hsl(50, 100%, 20%)"
@@ -166,6 +180,7 @@ AFRAME.registerComponent("imaging-slice", {
   schema: {
     imgpath: { default: "assets/datasets/dro-mel-fr-sl-2-450/membrane-staining/t_24_z_17.png" },
     color:   { default: "#fff" }
+     // ,AM: {}
   },
   init: function() {
     var texture = new THREE.TextureLoader().load(this.data.imgpath)
@@ -173,6 +188,7 @@ AFRAME.registerComponent("imaging-slice", {
     var material = new THREE.MeshBasicMaterial({
       color: this.data.color,
       alphaMap: texture,
+      //alphaMap: this.data.AM
       side: THREE.DoubleSide,
       transparent: true,
       opacity: 0.2,
@@ -190,7 +206,7 @@ AFRAME.registerComponent("embryo-stack", {
   // break this up into individual components, one per slice. then generate / remove them in loops
 
   schema: {
-    accordion: {default: 0.2},
+    accordion: {default: 5},
     accordionDelta: {default: 0},
     skew: {default: 0}
   },
@@ -206,6 +222,7 @@ AFRAME.registerComponent("embryo-stack", {
 
         plane.setAttributes({
           "imaging-slice": {
+            // imgpath: ch.time[t].images[n],
             imgpath: ch.images[n],
             color: ch.color
           },

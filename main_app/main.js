@@ -2,10 +2,11 @@ require('aframe');
 require('super-hands')
 var _ = require('lodash')
 
-var app = app || {}
+window.app = window.app || {}
 
 app.ctl = {
   zspacing: 0.2,
+  t: 0,
   initialposition: {x: 0, y: 0, z: -2}
 }
 
@@ -15,6 +16,28 @@ function make(what) {
   var el = document.createElement(what)
   return el;
 }
+
+window.addEventListener("keydown", e => {
+  // console.log(e.key)
+  if (e.key === "[") (app.ctl.t > 0) ? app.ctl.t-- : app.ctl.t = 0
+  if (e.key === "]") (app.ctl.t < app.embryo.steps-1) ? app.ctl.t++ : app.ctl.t = app.embryo.steps-1
+  console.log("time", app.ctl.t)
+  var stack = document.querySelector("#embryo1")
+  stack.setAttribute("embryo-stack", {
+    time: app.ctl.t
+  })
+})
+
+window.addEventListener("wheel", e => {
+  var stack = document.querySelector("#embryo1")
+  var current = [stack.getAttribute("embryo-stack").accordion, stack.getAttribute("embryo-stack").skew]
+
+  stack.setAttribute("embryo-stack", {
+    accordion: current[0] += e.deltaY,
+    skew: current[1] += e.deltaX
+  })
+})
+
 
 Element.prototype.setAttributes = function(attrs) {
   for(var key in attrs) {
@@ -28,7 +51,7 @@ app.embryo = {
   locator: "dro-mel-fr-sl-2-450", // format: genus_species_type_lab_channels_frames
   slices: 18,
   steps: 25,
-  time: 35280, // total seconds of recording
+  recording_length: 35280, // total seconds of recording
   frames: 450,
   framerate: 0, // will be useful if we want to display an image at a given time in seconds
   type: "fluorescence recording", // microscopy type
@@ -36,25 +59,13 @@ app.embryo = {
   channels: {
     // ideally these (and this whole object) would be generated server-side from the file hierarchy
     "membrane-staining": {
-      time: [
-        {step: 1,
-         images: [
-           "img/path",
-           "img2/path",
-           "img3/path"
-         ]},
-         {step: 2,
-         images: [
-           "img/path",
-           "img2/path",
-           "img3/path"
-         ]}
-      ],
+      time: [],
       path: "",
       images: [],
       color: "hsl(50, 100%, 20%)"
     },
     "nuclear-staining": {
+      time: [],
       path: "",
       images: [],
       color: "hsl(180, 100%, 40%)"
@@ -76,17 +87,25 @@ app.embryo = {
       // for every step
       _(cmp.steps).times(f => {
         // and for every slice
+
+        ch.time[f] = {
+          step: f,
+          images: [] // placeholder for this timestep's list of image slices
+        }
+
         _(cmp.slices).times(s => {
           // console.log("channel", key, "frame", f, "slice", s)
 
           // compose the filename
+          //      |---------------------- ch.path ---------------------||--filename-|
           // e.g. assets/datasets/dro-mel-fr-sl-2-450/membrane-staining/t_24_z_17.png
 
           var filename = "t_" + f + "_z_" + s + ".png"
+
           var path = ch.path + "/" + filename
 
-          // and add it to this channel's "images" array
-          ch.images.push(path)
+          // and add it to this channel's "images" array, at the proper time step
+          ch.time[f].images.push(path)
         })
       })
     })
@@ -98,17 +117,6 @@ app.embryo = {
 }
 
 
-window.addEventListener("wheel", e => {
-
-
-  var stack = document.querySelector("#embryo1")
-  var current = [stack.getAttribute("embryo-stack").accordion, stack.getAttribute("embryo-stack").skew]
-
-  stack.setAttribute("embryo-stack", {
-    accordion: current[0] += e.deltaY,
-    skew: current[1] += e.deltaX
-  })
-})
 
 AFRAME.registerComponent("axes", {
   schema: {
@@ -179,11 +187,18 @@ AFRAME.registerComponent("outline", {
 AFRAME.registerComponent("imaging-slice", {
   schema: {
     imgpath: { default: "assets/datasets/dro-mel-fr-sl-2-450/membrane-staining/t_24_z_17.png" },
-    color:   { default: "#fff" }
+    color:   { default: "#fff" },
+    time: {default: 0}
     // ,AM: {}
   },
   init: function() {
-    var texture = new THREE.TextureLoader().load(this.data.imgpath)
+
+  },
+
+  update: function() {
+    var newpath = this.data.imgpath.replace(/t_[0-9]+_/g, "t_" + this.data.time + "_")
+
+    var texture = new THREE.TextureLoader().load(newpath)
     var geometry = new THREE.PlaneGeometry(1,1)
     var material = new THREE.MeshBasicMaterial({
       color: this.data.color,
@@ -208,7 +223,8 @@ AFRAME.registerComponent("embryo-stack", {
   schema: {
     accordion: {default: 0.2},
     accordionDelta: {default: 0},
-    skew: {default: 0}
+    skew: {default: 0},
+    time: {default: 0}
   },
   init: function() {
     var cmp = this
@@ -222,8 +238,8 @@ AFRAME.registerComponent("embryo-stack", {
 
         plane.setAttributes({
           "imaging-slice": {
-            // imgpath: ch.time[t].images[n],
-            imgpath: ch.images[n],
+            imgpath: ch.time[app.ctl.t].images[n],
+            // imgpath: ch.images[n],
             color: ch.color
           },
           "outline": {
@@ -245,7 +261,14 @@ AFRAME.registerComponent("embryo-stack", {
     var cmp = this
     var parent = this.el
     var kids = cmp.el.querySelectorAll("*")
+
+    // console.log("stack time", cmp.data.time)
     _(kids).each((ell, ix) => {
+
+
+      ell.setAttribute('imaging-slice', {time: cmp.data.time})
+
+
       ratio = ix/app.embryo.slices
       // console.log(ix/app.embryo.slices * cmp.data.accordion + app.ctl.initialposition.z)
       ell.setAttribute('position', {

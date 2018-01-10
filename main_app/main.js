@@ -188,6 +188,7 @@ AFRAME.registerComponent("imaging-slice", {
   schema: {
     imgpath: { default: "assets/datasets/dro-mel-fr-sl-2-450/membrane-staining/t_24_z_17.png" },
     color:   { default: "#fff" },
+    slice_index: {default: 0},
     time: {default: 0}
     // ,AM: {}
   },
@@ -195,6 +196,7 @@ AFRAME.registerComponent("imaging-slice", {
     var cmp = this
 
     this.textures = _(app.embryo.steps).times(t => {
+      console.log("slice", cmp.data.slice_index, "loading timestep", t)
       return new THREE.TextureLoader().load(cmp.data.imgpath.replace(/t_[0-9]+_/g, "t_" + t + "_"))
     })
     var geometry = new THREE.PlaneGeometry(1,1)
@@ -213,7 +215,7 @@ AFRAME.registerComponent("imaging-slice", {
   },
 
   update: function() {
-    console.log(this.data.time)
+    // console.log(this.data.time)
     this.el.getObject3D("mesh").material.alphaMap = this.textures[this.data.time]
   }
 
@@ -243,7 +245,8 @@ AFRAME.registerComponent("embryo-stack", {
           "imaging-slice": {
             imgpath: ch.time[app.ctl.t].images[n],
             // imgpath: ch.images[n],
-            color: ch.color
+            color: ch.color,
+            slice_index: n
           },
           "outline": {
             color: ch.color

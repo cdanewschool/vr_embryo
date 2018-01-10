@@ -1,5 +1,5 @@
-require('aframe');
-require('super-hands')
+var af = require('aframe');
+var sh = require('super-hands')
 var _ = require('lodash')
 
 window.app = window.app || {}  // establish global app variable for state changes

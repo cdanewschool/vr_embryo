@@ -7,7 +7,7 @@ window.app = window.app || {}  // establish global app variable for state change
 app.ctl = {
   zspacing: 0.2, // unused
   t: 0, // time step
-  initialposition: {x: 0, y: 0, z: -2} // for placing embryo stack initially
+  initialposition: {x: 0, y: 1, z: -0.5} // for placing embryo stack initially
 }
 
 app.coordinates = AFRAME.utils.coordinates;
@@ -31,12 +31,21 @@ window.addEventListener("keydown", e => {
   // increment / decrement time step (but keep it in the 0-steps range)
   if (e.key === "[") (app.ctl.t > 0) ? app.ctl.t-- : app.ctl.t = 0
   if (e.key === "]") (app.ctl.t < app.embryo.steps-1) ? app.ctl.t++ : app.ctl.t = app.embryo.steps-1
+  // change the position of the stack
+  if (e.key === "j"){app.ctl.initialposition.x--}
+  if (e.key === "l"){app.ctl.initialposition.x++}
+  if (e.key === "i"){app.ctl.initialposition.y--} 
+  if (e.key === "k"){app.ctl.initialposition.y++} 
+  if (e.key === "u"){app.ctl.initialposition.z--} 
+  if (e.key === "o"){app.ctl.initialposition.z++}
   console.log("time", app.ctl.t)
+  console.log("position x", app.ctl.initialposition.x)
 
   var stack = document.querySelector("#embryo1") // get the embryo stack's parent a-entity
   stack.setAttribute("embryo-stack", { // target the embryo-stack component
     time: app.ctl.t // modify this component's "time" datapoint in its schema
     // (this causes "update()" to happen)
+    // position: app.ctl.initialposition
   })
 })
 
@@ -116,8 +125,6 @@ app.embryo = {
     // so if you wanted to "extract" a given image, you could do app.embryo.getImage("membrane-staining", 2, 4)
   }
 }
-
-
 
 AFRAME.registerComponent("axes", {
   // draws world axes in the 3d space

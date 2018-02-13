@@ -53,25 +53,20 @@ window.addEventListener("wheel", e => {
 // data model for the embryo
 app.embryo = {
   species: "drosophilia melanogaster", // name of the species
-  locator: "dro-mel-fr-sl-2-450", // format: genus_species_type_lab_channels_frames
-  slices: 18,
-  steps: 25,
-  recording_length: 35280, // total seconds of recording
-  frames: 450,
+  locator: "DDMD/SID3544/", // format: genus_species_type_lab_channels_frames "dro-mel-fr-sl-2-450",
+  slices: 200,
+  steps: 1,
+  recording_length: 1, // total seconds of recording
+  frames: 1,
   framerate: 0, // will be useful if we want to display an image at a given time in seconds
   type: "fluorescence recording", // microscopy type
   origin: "Shvartsman Lab", // lab origin
   channels: {
     // ideally these (and this whole object) would be generated server-side from the file hierarchy
-    "membrane-staining": {
+    "cubic": {
       time: [], // empty array in which to store all the images
       path: "",  // to store the part of the url that corresponds to the channel
       color: "hsl(50, 100%, 20%)"
-    },
-    "nuclear-staining": {
-      time: [],
-      path: "",
-      color: "hsl(180, 100%, 40%)"
     }
   },
   init: function() {
@@ -101,7 +96,7 @@ app.embryo = {
           //      |---------------------- ch.path ---------------------||--filename-|
           // e.g. assets/datasets/dro-mel-fr-sl-2-450/membrane-staining/t_24_z_17.png
 
-          var filename = "t_" + f + "_z_" + s + ".png"
+          var filename = "t_" + f + "_z_" + s + ".jpg"
           var path = ch.path + "/" + filename
 
           // and add it to this channel's "images" array, at the proper time step
@@ -219,7 +214,7 @@ AFRAME.registerComponent("imaging-slice", {
       transparent: true,
       opacity: 0.2,
       depthWrite: false,
-      blending: THREE.AdditiveBlending
+      blending: THREE.MultiplyBlending
     })
     var mesh = new THREE.Mesh(geometry, material); // create mesh
     this.el.setObject3D("mesh", mesh) // assign it

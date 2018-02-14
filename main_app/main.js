@@ -54,7 +54,7 @@ window.addEventListener("wheel", e => {
 app.embryo = {
   species: "drosophilia melanogaster", // name of the species
   locator: "DDMD/SID3544/", // format: genus_species_type_lab_channels_frames "dro-mel-fr-sl-2-450",
-  slices: 200,
+  slices: 600,
   steps: 1,
   recording_length: 1, // total seconds of recording
   frames: 1,
@@ -96,7 +96,7 @@ app.embryo = {
           //      |---------------------- ch.path ---------------------||--filename-|
           // e.g. assets/datasets/dro-mel-fr-sl-2-450/membrane-staining/t_24_z_17.png
 
-          var filename = "t_" + f + "_z_" + s + ".jpg"
+          var filename = "t_" + f + "_z_" + s + ".png"
           var path = ch.path + "/" + filename
 
           // and add it to this channel's "images" array, at the proper time step
@@ -173,7 +173,7 @@ AFRAME.registerComponent("outline", {
     var emat = new THREE.LineBasicMaterial( {
       color: this.data.color,
       transparent: true,
-      opacity: 0.4,
+      opacity: 0.01,
       linewidth: 1
     });
     var wireframe = new THREE.LineSegments( egeo, emat );
@@ -212,9 +212,9 @@ AFRAME.registerComponent("imaging-slice", {
       alphaMap: this.textures[this.data.time], // choose which texture to use based on the schema (defaults to 0)
       side: THREE.DoubleSide,
       transparent: true,
-      opacity: 0.2,
+      opacity: 0.02,
       depthWrite: false,
-      blending: THREE.MultiplyBlending
+      blending: THREE.AdditiveBlending
     })
     var mesh = new THREE.Mesh(geometry, material); // create mesh
     this.el.setObject3D("mesh", mesh) // assign it
@@ -232,8 +232,8 @@ AFRAME.registerComponent("imaging-slice", {
 AFRAME.registerComponent("embryo-stack", {
   // component for the stack as a whole
   schema: {
-    accordion: {default: 0.2}, // spread perpendicular to the planes
-    accordionDelta: {default: 0},
+    accordion: {default: 0.5}, // spread perpendicular to the planes
+    accordionDelta: {default: 0.5},
     skew: {default: 0}, // spread parallel to the planes
     time: {default: 0} // current timestep (passed through to slices)
   },

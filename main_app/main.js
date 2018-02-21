@@ -54,7 +54,7 @@ window.addEventListener("wheel", e => {
 app.embryo = {
   species: "drosophilia melanogaster", // name of the species
   locator: "DDMD/SID3544/", // format: genus_species_type_lab_channels_frames "dro-mel-fr-sl-2-450",
-  slices: 600,
+  slices: 500,
   steps: 1,
   recording_length: 1, // total seconds of recording
   frames: 1,

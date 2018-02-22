@@ -54,7 +54,7 @@ window.addEventListener("wheel", e => {
 app.embryo = {
   species: "drosophilia melanogaster", // name of the species
   locator: "DDMD/SID3544/", // format: genus_species_type_lab_channels_frames "dro-mel-fr-sl-2-450",
-  slices: 500,
+  slices: 1030,
   steps: 1,
   recording_length: 1, // total seconds of recording
   frames: 1,
@@ -96,7 +96,7 @@ app.embryo = {
           //      |---------------------- ch.path ---------------------||--filename-|
           // e.g. assets/datasets/dro-mel-fr-sl-2-450/membrane-staining/t_24_z_17.png
 
-          var filename = "t_" + f + "_z_" + s + ".png"
+          var filename = "t_" + f + "_z_" + s + "_red.png"
           var path = ch.path + "/" + filename
 
           // and add it to this channel's "images" array, at the proper time step

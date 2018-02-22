@@ -45,7 +45,7 @@ window.addEventListener("wheel", e => {
   var current = [stack.getAttribute("embryo-stack").accordion, stack.getAttribute("embryo-stack").skew]
 
   stack.setAttribute("embryo-stack", {
-    accordion: current[0] += e.deltaY,
+    accordion: current[0] += e.deltaY*0.01,
     skew: current[1] += e.deltaX
   })
 })
@@ -66,7 +66,7 @@ app.embryo = {
     "cubic": {
       time: [], // empty array in which to store all the images
       path: "",  // to store the part of the url that corresponds to the channel
-      color: "hsl(50, 100%, 20%)"
+      color: "hsl(50, 50%, 10%)"
     }
   },
   init: function() {
@@ -96,7 +96,7 @@ app.embryo = {
           //      |---------------------- ch.path ---------------------||--filename-|
           // e.g. assets/datasets/dro-mel-fr-sl-2-450/membrane-staining/t_24_z_17.png
 
-          var filename = "t_" + f + "_z_" + s + "_red.png"
+          var filename = "t_" + f + "_z_" + s + "_red_0.05.png"
           var path = ch.path + "/" + filename
 
           // and add it to this channel's "images" array, at the proper time step
@@ -232,7 +232,7 @@ AFRAME.registerComponent("imaging-slice", {
 AFRAME.registerComponent("embryo-stack", {
   // component for the stack as a whole
   schema: {
-    accordion: {default: 0.5}, // spread perpendicular to the planes
+    accordion: {default: 70}, // spread perpendicular to the planes
     accordionDelta: {default: 0.5},
     skew: {default: 0}, // spread parallel to the planes
     time: {default: 0} // current timestep (passed through to slices)
